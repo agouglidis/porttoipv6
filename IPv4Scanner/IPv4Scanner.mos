@@ -1,0 +1,375 @@
+/***************************************************************************
+ *   Copyright (C) 2005-2017 by Antonios Gouglidis			   			   *
+ *   e-mail: agouglidis@gmail.com   					   				   *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+
+
+/*  Definitions */
+
+%{
+
+#ifdef __CYGWIN__
+using namespace std;
+#endif /* __CYGWIN__ */
+
+// Include files
+#include <iostream>
+#include <string>
+#include <fstream>
+using std::fstream;
+
+#include "../include/common.h"
+
+// Function prototypes
+/*! \fn string createXmlTag(gXmlTagData* pXmlTagData)
+	\brief Resolves the string value of the data being matched and constucts XML tags
+	\param *pXmlTagData A structure containing the required information 
+	\return A string containing XML tags with information from *pXmlTagData
+  */	
+string createXmlTag(gXmlTagData* pXmlTagData);
+
+/*! \fn void helpScreen(void)
+	\brief Print help screen
+	\return void
+ */
+void helpScreen(void);
+
+/*! \fn void helpScreen(void)
+	\brief Print a list of current compiled APIs
+	\return void
+ */
+void printAPIs(void);
+
+/*! \fn int initScanner(int argc, char** argv)
+	\brief Initialise Scanner variables based on given commands
+	\param argc 
+	\param argv
+	\return int
+ */
+int initScanner(int argc, char** argv);
+
+/*! \fn void copyToFile(gXmlTagData* pXmlTagData)
+	\brief Copy XML tag contents into the declared xml file
+	\param *pXmlTagData A structure containing the required information 
+	\return void
+ */
+void copyToFile(gXmlTagData* pXmlTagData);
+
+/*! \fn string buildXmlTag(gXmlTagData* pXmlTagData)
+	\brief Builds an XML tag. Called by createXmlTag
+	\param *pXmlTagData A structure containing the required information 
+	\return string An XML tag containing all given information
+ */
+string buildXmlTag(gXmlTagData* pXmlTagData);
+
+// Variables
+const string& PF_SCANNER_VERSION = "0.0.5"; /*!< Contains scanner version */
+const string& PF_SCANNER_NAME = "ipv4scanner"; /*!< Contains scanner name */
+
+fstream	gXmlMetadataFile; /*!< filestream */
+string	gXmlFilename = "XML_metadata.xml"; /*!< Contains the name of the XML file */
+string	gXmlStyleSheet = ""; /*!< Contains the stylesheet file in use */
+
+bool gNoComments; /*!< Parse comments or not */
+
+#include_verbatim "../patterns/cpp/variables.def"
+
+%}
+
+%option c++
+%option stack
+%option yylineno
+%option noyywrap
+
+/* WhiteSpace or NewLine */
+DELIMITER [ \t\n]
+
+/* Zero, one or more delimiters - Kleene closure of DELIMITER */
+WHITESPACE {DELIMITER}*
+
+/* At least one delimiter - Positive closure of DELIMITER */
+WHITESPACE_POSITIVE {DELIMITER}+
+
+#include_verbatim "../patterns/cpp/conditions.rules"
+
+#include_verbatim "../patterns/cpp/CommonVerbatim.rules"
+#include_xml "../patterns/cpp/Common.rules.xml"
+#include_xml "../patterns/cpp/Bsd.rules.xml"
+#include_xml "../patterns/cpp/Winsock.rules.xml"
+
+<<EOF>> {
+	// Will be executed ONCE at the end of the file being parsed.	
+	gXmlMetadataFile << "\n</ipv4_metadata>";
+	std::cout << "\nEnd of file\n";
+	yyterminate(); 
+}
+
+%%
+/* start of C++ code */
+
+/*! \fn int main(int argc, char** argv)
+	\brief The main programme
+	\param argc Number of parameters
+	\param argv Contains the string of the parameters
+	\return Error codes, and PF_SUCCESS for success
+*/
+int main(int argc, char** argv)
+{
+	/* Initialize global variables */
+	#include_verbatim "../patterns/cpp/Apis.def"
+	gNoComments = false;
+
+	setGlobalActiveApi(0);
+	
+	initScanner(argc, argv);
+	
+	// Instansiate a FlexLexer Object
+	FlexLexer* lexer = new yyFlexLexer;
+	
+	try
+	{
+		gXmlMetadataFile.open(gXmlFilename.c_str(), std::ios::out);
+		if (!gXmlMetadataFile) 
+		{
+			throw (PF_ERROR);
+		}
+	}
+	catch (int errorNum)
+	{
+		std::cerr << PF_SCANNER_NAME << ": error creating file " << gXmlFilename; 
+		exit (errorNum);
+	}
+
+	// Start constructing a proper XML file
+	gXmlMetadataFile << "<?xml version=\"1.0\"?>\n";
+
+	if (gXmlStyleSheet != "") 
+		gXmlMetadataFile << "<?xml-stylesheet type=\"text/xsl\" href=\"" << gXmlStyleSheet << "\"?>"; 
+
+	gXmlMetadataFile << "\n<ipv4_metadata application=\"PortToIPv6 Framework\" component=\"" << PF_SCANNER_NAME << "\" version=\"" << PF_SCANNER_VERSION << "\">";
+
+	// Add some more information for the file being parsed
+	
+	// Add the file name
+	gXmlMetadataFile << "\n\t<extraInformation>\n\t\t<filename>" << gXmlFilename << "</filename>"; 
+	// Add the API in use
+	gXmlMetadataFile << "\n\t\t<api>" << gVectorApis[getGlobalActiveApi()].name << "</api>";
+
+	//Add information about the framework
+	gXmlMetadataFile << "\n\t\t<application>The following information was generated automatically by the "
+			<< PF_SCANNER_NAME << " component.</application>";
+	
+	gXmlMetadataFile << "\n\t</extraInformation>";
+
+	// Start parsing of file
+	lexer->yylex();
+	
+	gXmlMetadataFile.close();
+
+	delete lexer;
+	return PF_SUCCESS;
+}
+
+
+void helpScreen(void)
+{
+	using std::cout;
+
+	cout << PF_SCANNER_NAME << " - An integral part of PortToIPv6 framework\n";
+	cout << PF_COPYRIGHT << "\n\n";
+
+	cout << PF_SCANNER_NAME <<" [-f filename.xml] [-s file] [--apiNUMBER] [--no_comments] < source [> output]\n";
+	cout << "\t-f\t\tdefine XML file to save metadata (default is XML_metadata.xml)\n";
+	cout << "\t-s\t\tdefine stylesheet file for XML file\n";
+	cout << "\t-l\t\ttake a list of current compiled API's\n";	
+	cout << "\t-h\t\tproduce this help message\n";
+	cout << "\t--help\t\tproduce this help message\n";
+	cout << "\t--no_comments\tdo not scan comments\n";
+	cout << "\t--version\treport " << PF_SCANNER_NAME << " version\n";
+	cout << "\t--apiNUMBER\tUse -l to get a list of available APIs (default is 0)\n";
+	cout << "\t-?\t\tproduce this help message\n";
+}
+
+void printAPIs(void)
+{
+	using std::cout;
+
+	cout << "List of current compiled APIs:\n";
+	for (unsigned int i=0; i<gVectorApis.size(); i++)
+	{
+		cout << "\tuse --api" << i << " for: " << gVectorApis[i].name << "\n";
+	}
+}
+
+string createXmlTag(gXmlTagData* pXmlTagData)
+{
+	string xml_str = "";
+
+	// Resolve types' string name
+	switch (pXmlTagData->typeId)
+	{
+		case PF_STRUCTURE:
+			pXmlTagData->type = "STRUCTURE";
+			break;
+		case PF_FUNCTION:
+			pXmlTagData->type = "FUNCTION";
+			break;
+		case PF_IPV4ADDR:
+			pXmlTagData->type = "IPv4ADDR";
+			break;
+		case PF_URL:
+			pXmlTagData->type = "URL";
+			break;
+		case PF_HEADER_FILE:
+			pXmlTagData->type = "HEADER_FILE";
+			break;	
+		case PF_MACRO:
+			pXmlTagData->type = "MACRO";
+			break;	
+		case PF_IPV4_CENTRIC:
+			pXmlTagData->type = "IPV4_CENTRIC";
+			break;
+	}
+	
+	xml_str = buildXmlTag(pXmlTagData);
+	return xml_str;
+}
+
+void copyToFile(gXmlTagData* pXmlTagData)
+{
+	string sXml = createXmlTag(pXmlTagData);
+	gXmlMetadataFile << sXml; 
+	std::cout << "\nPattern " << pXmlTagData->name << " found!!! Line number: " << pXmlTagData->line << "\n"; 
+}
+
+string buildXmlTag(gXmlTagData* pXmlTagData)
+{
+	string sXmlTag = "";
+
+	sXmlTag = "\n\t<information>\n\t\t<line>"; 
+	sXmlTag += toString<long>( pXmlTagData->line, std::dec );
+	sXmlTag += "</line>\n\t\t<typeid>";
+	sXmlTag += toString<long>( pXmlTagData->typeId, std::dec );
+	sXmlTag += "</typeid>\n\t\t<type>" + pXmlTagData->type + "</type>\n\t\t<name>" + pXmlTagData->name;
+	sXmlTag += "</name>\n\t\t<comment>" + pXmlTagData->comment;
+	sXmlTag += "</comment>\n\t</information>";
+	return sXmlTag;
+}
+
+int initScanner(int argc, char** argv)
+{
+	const char* arg;
+	bool argParam = false;
+	char parameter = ' ';
+	short int pos = 0;
+	string sNumOfApi;
+	unsigned int iNumOfApi;
+
+	for (--argc, ++argv; argc; --argc, ++argv )
+	{
+		arg = argv[0];
+
+		if (arg[0] != '-' || arg[1] == '\0')
+		{
+			argParam = true;
+		}
+
+		if (!argParam)
+		{
+			if ( arg[1] == '-' )
+			{
+				if (!strcmp(arg, "--help"))
+					arg = "-h";
+				else if (!strcmp(arg,"--version"))
+					arg = "-v";
+				else if ( findString(arg,"--api"))
+				{
+					sNumOfApi = removeString(arg, "--api");
+					iNumOfApi = atoi(sNumOfApi.c_str());
+					arg = "-a";
+				}
+				else if (!strcmp(arg,"--no_comments"))
+					arg = "-n";
+				else if (!strcmp(arg, "--" ))
+					{
+						--argc;
+						++argv;
+						break;
+					}
+			}
+			
+			for (int i=1; arg[i] != '\0'; ++i)
+				switch (arg[i])
+				{
+					case '?':
+					case 'h':
+						helpScreen();
+						exit (PF_SUCCESS);
+	
+					case 'v':
+						std::cout << PF_NAME << " version " << PF_VERSION << " Release " << PF_RELEASE << "\n";
+						std::cout << PF_SCANNER_NAME << " version " << PF_SCANNER_VERSION << "\n";
+						exit (PF_SUCCESS);
+
+					case 'l':
+						printAPIs();
+						exit (PF_SUCCESS);
+		
+					case 'a':
+						if (iNumOfApi>gVectorApis.size()-1)
+						{
+							std::cerr << "\nNot a supported API.\n";
+							exit(PF_ERROR);
+						}
+						setGlobalActiveApi(iNumOfApi);
+						break;
+
+					case 'n':
+						gNoComments = true;
+						break;
+	
+					case 'f':
+						argParam = true;
+						parameter = 'f';
+						pos = i;
+						break;
+	
+					case 's':
+						argParam = true;
+						parameter = 's';
+						pos = i;
+						break;
+
+					default:
+						std::cerr << PF_SCANNER_NAME << ": unknown flag " << arg[i] << ".  For usage, try\n\t"<< PF_SCANNER_NAME << " --help\n";
+						exit (PF_ERROR);
+				}
+				
+		} /* if (!argParam) */
+		
+		if (argParam)
+		{
+			if (parameter == 'f')
+				{if (strcmp(argv[pos-1],"-f")) gXmlFilename = argv[pos-1];}
+			else if (parameter == 's')
+				{if (strcmp(argv[pos-1],"-s")) gXmlStyleSheet = argv[pos-1];}
+			argParam = false;
+		}
+	}
+	return PF_SUCCESS;
+}

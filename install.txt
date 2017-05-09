@@ -1,0 +1,1 @@
+Simply execute ./install.sh from a shell

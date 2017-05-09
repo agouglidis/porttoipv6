@@ -1,0 +1,11 @@
+
+	/* API names. */
+	gApi _api;
+
+	_api.inUse = false;
+	_api.name =  "BSD";
+	gVectorApis.push_back(_api);
+
+	_api.inUse = false;
+	_api.name =  "Microsoft(R) Windows(R) Winsock(R)";
+	gVectorApis.push_back(_api);

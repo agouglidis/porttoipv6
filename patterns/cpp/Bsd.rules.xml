@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!-- Description of BSD rules -->
+<rules>
+	<rule>
+		<CONDITION>BSD_API,START_COMMENTS_AND_BSD_API</CONDITION>
+		<PATTERN>"inet_aton"</PATTERN>
+		<TYPE>PF_FUNCTION</TYPE>
+		<COMMENT>Use inet_pton instead of inet_aton</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION>BSD_API,START_COMMENTS_AND_BSD_API</CONDITION>
+		<PATTERN>"inet_addr"</PATTERN>
+		<TYPE>PF_FUNCTION</TYPE>
+		<COMMENT>Use inet_pton instead of inet_addr</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION>BSD_API,START_COMMENTS_AND_BSD_API</CONDITION>
+		<PATTERN>"inet_ntoa"</PATTERN>
+		<TYPE>PF_FUNCTION</TYPE>
+		<COMMENT>Use inet_ntop instead of inet_ntoa</COMMENT>
+	</rule>
+</rules>

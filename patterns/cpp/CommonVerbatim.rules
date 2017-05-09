@@ -1,0 +1,4 @@
+<START_COMMENTS_AND_WINSOCK_API,START_COMMENTS_AND_BSD_API>{C_CPP_STYLE_COMMENT} {
+	// Jump C / C++ - style comments
+	std::cout << ": C/C++ style comment identified at line number: " << lineno() << "\n";
+}

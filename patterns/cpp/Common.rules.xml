@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<!-- Description of common rules -->
+<rules>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"sin_"</PATTERN>
+		<TYPE>PF_IPV4_CENTRIC</TYPE>
+		<COMMENT>This is a sockaddr_in member!!!!!. Change sin_ to sin6_</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"h_addrtype"</PATTERN>
+		<TYPE>PF_IPV4_CENTRIC</TYPE>
+		<COMMENT>This is a hostent member!!!!!. Change h_addrtype to ai_family. This occurs assuming that addrinfo is used instead of the hostent structure.</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"h_name"</PATTERN>
+		<TYPE>PF_IPV4_CENTRIC</TYPE>
+		<COMMENT>This is a hostent member!!!!!. Change h_name to ai_canonname. This occurs assuming that addrinfo is used instead of the hostent structure.</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"INADDR_BROADCAST"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Warning!!!. No equivalent for IPv6.</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IN_CLASS"[ABC]</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Valid for IPv4 only</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IN_CLASSD"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>use IN6_IS_ADDR_MULTICAST in addition for IPv6 support</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_MULTICAST_IF"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change IP_MULTICAST_IF to IPV6_MULTICAST_IF</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_ADD_MEMBERSHIP"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change IP_ADD_MEMBERSHIP to IPV6_JOIN_GROUP</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_MULTICAST_TTL"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>use SIO_MULTICAST_SCOPE instead, or use IPV6_MULTICAST_HOPS in addition for IPv6 support</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IN_MULTICAST"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change IN_MULTICAST to IN6_IS_ADDR_MULTICAST</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_MULTICAST_LOOP"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>use SIO_MULTIPOINT_LOOPBACK instead, or use IPV6_MULTICAST_LOOP in addition for IPv6 support</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_TTL"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change IP_TTL to IPV6_UNICAST_HOPS</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"AF_INET"[^6]</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change AF_INET to AF_INET6</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IPPROTO_IP"[^\"V6\"]</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Use IPPROTO_IPV6 in addition for IPv6 support instead of IPPROTO_IP</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"PF_INET"[^6]</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Change PF_INET to PF_INET6</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"INADDR_ANY"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Use getaddrinfo with nodename=NULL and AI_PASSIVE instead, or use in6addr_any in addition for IPv6 support instead of INADDR_ANY</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"INADDR_LOOPBACK"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>Use in6addr_loopback in addition for IPv6 support instead of INADDR_LOOPBACK</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"hostent"</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>Use addrinfo instead of hostent</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}"."[0-9]{1,3}("/"[0-9]{1,2})?</PATTERN>
+		<TYPE>PF_IPV4ADDR</TYPE>
+		<COMMENT>Define a proper IPv6 address</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>("http://".*)|("www.".*)</PATTERN>
+		<TYPE>PF_URL</TYPE>
+		<COMMENT>Change http://whatever to http://[ipv6 address]/whatever</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"in_addr"</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>Change in_addr to in6_addr</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"sockaddr_in"[^6]</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>Change sockaddr_in to sockaddr_in6 or sockaddr_storage</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"sockaddr"[^_]</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>Change sockaddr to sockaddr_in6 or sockaddr_storage</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"gethostbyname"</PATTERN>
+		<TYPE>PF_FUNCTION</TYPE>
+		<COMMENT>Use getaddrinfo instead of gethostbyname</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"gethostbyaddr"</PATTERN>
+		<TYPE>PF_FUNCTION</TYPE>
+		<COMMENT>Use getnameinfo instead of gethostbyaddr</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"PHOSTENT"</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>use LPADDRINFO instead</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"HOSTENT"</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>use ADDRINFO instead</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"ip_mreq"</PATTERN>
+		<TYPE>PF_STRUCTURE</TYPE>
+		<COMMENT>use ipv6_mreq in addition for IPv6 support</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IP_DROP_MEMBERSHIP"</PATTERN>
+		<TYPE>PF_MACRO</TYPE>
+		<COMMENT>use IPV6_LEAVE_GROUP in addition for IPv6 support</COMMENT>
+	</rule>
+	<rule>
+		<CONDITION></CONDITION>
+		<PATTERN>"IPAddr"</PATTERN>
+		<TYPE>PF_IPV4_CENTRIC</TYPE>
+		<COMMENT>use SOCKADDR_STORAGE instead</COMMENT>
+	</rule>
+</rules>

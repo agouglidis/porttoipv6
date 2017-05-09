@@ -1,0 +1,26 @@
+
+C_CPP_STYLE_COMMENT ("/""*"([^*]|[\r\n]|("*"+([^"*""/"]|[\r\n])))*"*"+"/")|("//".*)
+
+/* Start conditions */
+/* Inclusive */
+/*! WinSock API without support of exclutions of Comments */
+%s WINSOCK_API
+/*! BSD API without support of exclutions of Comments */
+%s BSD_API
+/*! WinSock API with support of exclutions of Comments */
+%s START_COMMENTS_AND_WINSOCK_API
+/*! BSD API with support of exclutions of Comments */
+%s START_COMMENTS_AND_BSD_API
+
+%% 
+	if ( gVectorApis[0].inUse )
+		BEGIN(BSD_API);
+	if ( gVectorApis[1].inUse )
+		BEGIN(WINSOCK_API);
+	if ( gNoComments && gVectorApis[0].inUse)
+		BEGIN(START_COMMENTS_AND_BSD_API);
+	if ( gNoComments && gVectorApis[1].inUse)
+		BEGIN(START_COMMENTS_AND_WINSOCK_API);
+
+
+{DELIMITER}*  {}

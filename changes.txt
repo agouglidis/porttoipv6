@@ -1,0 +1,86 @@
+- 09 May 2017: Release of PortToIPv6 0.0.5 Alpha 
+
+	Move to GitHub. Just a few minor changes in the code. 
+
+- 20 March 2007: Release of PortToIPv6 0.0.4 Alpha 
+
+	General notes: 
+		+ (Debian) currently using g++ (GCC) 4.1.2 and flex++ 2.5.33
+		+ (Windows) currently using cygwin g++ (GCC) 3.4.4, flex++ version 2.5.4 and cygwin1.dll version 1.5.24
+		+ A better class hierarchy of mappers
+		+ General improvements of base porting mapper
+
+	New Features:
+		+ Installer and code identifies CYGWIN enviroment and compile/install automatically
+		+ Addition of Winsock porting mapper
+
+- 02 February 2007: Release of PortToIPv6 0.0.3 Alpha for Windows
+
+- 28 July 2006: Release of PortToIPv6 0.0.3 Alpha
+
+	New Features:
+		+ PfMapper supports a more advanced IPv4 address conversion function. It provides a simple
+			interactive interface to the user and automatically constructs global, link-local,
+			site local, Teredo etc style IPv6 addresses.
+		+ Support of illimitably API identifiers by ipv4scanner and API Mappers by ipv6cg
+
+	Fixes:
+		+ Installer still prints out that everything was compiled correctly, even if an error occurs: FIXED
+		+ Line numbering is broken. Yeah, yeah I know, my mistake people. Switched back to lineno() :) : FIXED
+		+ Major code refining. A better API to add your own API identifiers and API Mappers
+
+
+- 25 June 2006: Release of PortToIPv6 0.0.2 Beta
+	General notes: 
+		+ currently using gcc version 4.1.0 instead of gcc version 4.0.2
+		+ currently using flex++ 2.5.31 instead of flex++ 2.5.4
+		+ use of Doxygen for the source code documentation 
+		+ new bash shell install script, with DEBUG ON|OFF functionality
+
+	common.{h, cc}:
+		+ atoi (c style) function has been substitued with ToString (c++ style)
+
+	mos:
+		+ memory leak in main: FIXED
+		+ #include_xml does not include CONDITION tags: FIXED
+
+	IPv4Scanner:
+		+ sustitution of yylineno() with a manual implementation for performance issues (PF_LINE_NUM)
+
+	ipv6cg:
+		+ memory leak in FindString function: FIXED
+
+	TODO:
+		...
+
+- 28 April 2006: Release of PortToIPv6 0.0.2 Alpha
+
+	- mos 0.0.2
+		- support of #include_verbatim, to include verbatim code 
+		- support of #include_xml, to include specific XML data structures and generate automatically source code
+		- Use of tinyXml
+
+	- ipv4scanner 0.0.2
+		- code refining due to mos changes
+
+	- ipv6cg 0.0.2 (first release)
+		- Implementation of a base class PfBaseClass, a.k.a. core engine for the code generator
+		- Implementation of MapperBsd, based on the RFC-2133 guidelines for Basic Socket Interface Extensions for IPv6
+		- Use of tinyXml
+
+	TODO:
+	- mos: ?
+	- ipv4scanner: support of more than 2 APIs
+	- ipv6cg: 
+		- This tool is still immature and needs a lot of refining. It is out there mostly for testing. 
+		- Try to include RFC-2292 guidelines about Advanced Sockets API for IPv6
+		- Improve class API
+		- support more mappers
+		- 
+	- Documentation, porting tutorials.
+
+	Still a lot to do :)
+
+- 21 February 2006: Release of PortToIPv6 0.0.1 Beta
+
+	TODO: A lot to do :)
